@@ -4,315 +4,101 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
     <title>Aethera - Suite de Parto</title>
-
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#36e27b",
-                        "primary-dark": "#2ab863",
-                        "background-light": "#f6f8f7",
-                        "background-dark": "#112117",
-                        "surface-dark": "#1c3024",
-                        "surface-highlight": "#2a3b50",
-                        "surface-card": "#163326",
-                    }
-                }
-            }
-        }
-    </script>
-    
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#36e27b", "background-dark": "#112117", "surface-dark": "#1c3024" } } } }
+    </script>
     <style>
-        /* FIX: Activar scroll y ocultar barras */
-        html, body { height: 100%; background-color: #112117; }
-        #root { height: 100%; }
-        .app-container { height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        html, body { height: 100%; background-color: #112117; margin: 0; overflow: hidden; }
+        .app-container { height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
     </style>
 </head>
-<body class="bg-background-dark font-display text-white antialiased">
+<body>
     <div id="root"></div>
-
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        const { MemoryRouter, Routes, Route, useNavigate } = ReactRouterDOM;
+        const { useState, useEffect } = React;
+        const { HashRouter, Routes, Route, useNavigate } = ReactRouterDOM;
 
-        // --- MOTOR DE DATOS ---
-        const useStorage = (key, initial) => {
-            const [val, setVal] = useState(() => JSON.parse(localStorage.getItem(key)) || initial);
-            useEffect(() => localStorage.setItem(key, JSON.stringify(val)), [val]);
-            return [val, setVal];
-        };
+        const Screen = ({ children }) => <div className="app-container animate-fade-in bg-background-dark text-white">{children}</div>;
 
-        // --- PANTALLAS PRINCIPALES ---
-
-        const DisclaimerScreen = () => {
-            const navigate = useNavigate();
-            const [accepted, setAccepted] = useState(false);
+        const Disclaimer = () => {
+            const nav = useNavigate();
             return (
-                <div className="app-container flex flex-col p-6 justify-between animate-fade-in">
-                    <div className="text-center pt-10">
-                        <div className="size-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6"><span className="material-symbols-outlined text-primary text-5xl">shield_with_heart</span></div>
-                        <h1 className="text-3xl font-bold mb-4 uppercase italic tracking-tighter">Aethera</h1>
-                        <div className="bg-red-900/20 border border-red-500/20 p-5 rounded-2xl text-left mb-6">
-                            <p className="text-red-200 font-bold mb-1">Aviso Legal</p>
-                            <p className="text-red-300 text-sm leading-relaxed">Esta suite es informativa. No sustituye el juicio clínico. En caso de sangrado, pérdida de líquido o falta de movimiento, acuda a urgencias.</p>
+                <Screen>
+                    <div className="p-8 flex-1 flex flex-col justify-center text-center">
+                        <span className="material-symbols-outlined text-primary text-7xl mb-6">shield_with_heart</span>
+                        <h1 className="text-4xl font-bold mb-8 italic uppercase tracking-tighter">Aethera</h1>
+                        <div className="bg-red-900/20 border border-red-500/20 p-6 rounded-2xl text-left mb-10">
+                            <p className="text-red-200 font-bold mb-2">Aviso Legal</p>
+                            <p className="text-red-300 text-sm italic">Esta app es informativa. No sustituye el diagnóstico médico.</p>
                         </div>
+                        <button onClick={() => nav('/welcome')} className="w-full h-16 bg-primary text-black font-black rounded-full shadow-lg">ACEPTAR Y ENTRAR</button>
                     </div>
-                    <div className="pb-8">
-                        <label className="flex items-start gap-3 cursor-pointer mb-6">
-                            <input type="checkbox" className="mt-1 rounded bg-transparent border-gray-500 text-primary" checked={accepted} onChange={e => setAccepted(e.target.checked)} />
-                            <span className="text-sm text-gray-400">He leído y acepto los términos de uso educativo.</span>
-                        </label>
-                        <button onClick={() => accepted && navigate('/welcome')} disabled={!accepted} className={`w-full h-14 rounded-full font-bold flex items-center justify-center gap-2 transition-all ${accepted ? 'bg-primary text-background-dark shadow-lg' : 'bg-gray-700 text-gray-500'}`}>ENTRAR</button>
-                    </div>
-                </div>
+                </Screen>
             );
         };
 
-        const WelcomeScreen = () => {
-            const navigate = useNavigate();
+        const Welcome = () => {
+            const nav = useNavigate();
             return (
-                <div className="app-container flex flex-col p-6 justify-between animate-fade-in">
-                    <div className="flex items-center gap-2 pt-4"><span className="material-symbols-outlined text-primary text-3xl">spa</span><span className="font-bold text-lg">Aethera</span></div>
-                    <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl my-8">
-                        <div className="absolute inset-0 bg-cover bg-center" style={{backgroundImage: "url('https://images.unsplash.com/photo-1555252333-9f8e92e65ee9?auto=format&fit=crop&q=80&w=800')"}}></div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+                <Screen>
+                    <div className="p-6 flex flex-col h-full justify-between items-center">
+                        <div className="w-full flex items-center gap-2"><span className="material-symbols-outlined text-primary text-3xl">spa</span><span className="font-bold">Aethera</span></div>
+                        <div className="w-full aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl my-4 bg-cover bg-center" style={{backgroundImage: "url('https://images.unsplash.com/photo-1555252333-9f8e92e65ee9?auto=format&fit=crop&q=80&w=800')"}}></div>
+                        <div className="text-center pb-8 w-full">
+                            <h2 className="text-4xl font-bold mb-4 italic">Tu cuerpo sabe parir</h2>
+                            <button onClick={() => nav('/dash')} className="w-full h-16 bg-primary text-black font-black rounded-full">EMPEZAR</button>
+                        </div>
                     </div>
-                    <div className="text-center pb-10">
-                        <h1 className="text-4xl font-bold mb-3 tracking-tight italic">Tu cuerpo sabe parir</h1>
-                        <p className="text-gray-400 italic mb-8">Suite profesional de acompañamiento y monitorización.</p>
-                        <button onClick={() => navigate('/resources')} className="w-full h-16 rounded-full bg-primary text-background-dark font-black text-lg shadow-xl">Empezar mi camino</button>
-                    </div>
-                </div>
+                </Screen>
             );
         };
 
-        const ResourcesScreen = () => {
-            const navigate = useNavigate();
+        const Dash = () => {
+            const nav = useNavigate();
             return (
-                <div className="app-container bg-background-dark animate-fade-in">
-                    <header className="p-6 flex justify-between items-center sticky top-0 bg-background-dark/95 backdrop-blur-md z-30 border-b border-white/5">
-                        <h2 className="text-xl font-bold">Recursos</h2>
-                        <span className="material-symbols-outlined">search</span>
-                    </header>
-                    <main className="p-4 space-y-6 pb-32">
-                        <div onClick={() => navigate('/plan')} className="relative h-64 rounded-[2.5rem] overflow-hidden shadow-lg group cursor-pointer">
-                            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: 'url("https://images.unsplash.com/photo-1531983412531-1f49a365ffed?auto=format&fit=crop&q=80&w=800")'}}></div>
-                            <div className="absolute inset-0 bg-black/30"></div>
-                            <div className="absolute bottom-6 left-6"><span className="bg-primary text-background-dark px-3 py-1 rounded-full text-[10px] font-bold mb-2 uppercase tracking-widest">Plan de Parto</span><h3 className="text-2xl font-bold tracking-tight">Tu visión del nacimiento</h3></div>
+                <Screen>
+                    <header className="p-6 border-b border-white/5 flex justify-between items-center"><h2 className="text-xl font-bold italic uppercase tracking-widest">Recursos</h2></header>
+                    <main className="p-4 flex-1 overflow-y-auto no-scrollbar space-y-4">
+                        <div onClick={() => nav('/counter')} className="p-6 bg-surface-dark rounded-3xl flex items-center justify-between border border-white/5">
+                            <div className="flex items-center gap-4"><span className="material-symbols-outlined text-primary text-4xl">timer</span><div><p className="font-bold">Contador</p><p className="text-xs opacity-40">Métricas reales</p></div></div>
+                            <span className="material-symbols-outlined opacity-20">chevron_right</span>
                         </div>
-
-                        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-                            <button onClick={() => navigate('/breathing')} className="flex items-center gap-2 px-6 py-3 rounded-full bg-surface-dark border border-gray-700 whitespace-nowrap"><span className="material-symbols-outlined text-primary text-sm">air</span> Respiración</button>
-                            <button onClick={() => navigate('/positions')} className="flex items-center gap-2 px-6 py-3 rounded-full bg-surface-dark border border-gray-700 whitespace-nowrap"><span className="material-symbols-outlined text-primary text-sm">accessibility_new</span> Posiciones</button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4">
-                            <div onClick={() => navigate('/counter')} className="flex bg-surface-dark rounded-3xl border border-white/5 p-5 items-center justify-between active:scale-95 transition-all">
-                                <div className="flex items-center gap-4"><span className="material-symbols-outlined text-primary text-4xl">timer</span><div><h4 className="font-bold">Contador</h4><p className="text-xs text-gray-500 italic">Métricas en tiempo real</p></div></div>
-                                <span className="material-symbols-outlined">chevron_right</span>
-                            </div>
-                            <div onClick={() => navigate('/eval-1')} className="flex bg-surface-dark rounded-3xl border border-white/5 p-5 items-center justify-between active:scale-95 transition-all">
-                                <div className="flex items-center gap-4"><span className="material-symbols-outlined text-blue-400 text-4xl">stethoscope</span><div><h4 className="font-bold">Evaluador</h4><p className="text-xs text-gray-500 italic">Detección de fase activa</p></div></div>
-                                <span className="material-symbols-outlined">chevron_right</span>
-                            </div>
+                        <div onClick={() => nav('/positions')} className="p-6 bg-surface-dark rounded-3xl flex items-center justify-between border border-white/5">
+                            <div className="flex items-center gap-4"><span className="material-symbols-outlined text-blue-400 text-4xl">accessibility_new</span><div><p className="font-bold">Posiciones</p><p className="text-xs opacity-40">Guía visual</p></div></div>
+                            <span className="material-symbols-outlined opacity-20">chevron_right</span>
                         </div>
                     </main>
-                    <nav className="fixed bottom-0 w-full max-w-md bg-surface-dark/95 border-t border-gray-800 p-4 flex justify-around items-center z-50 rounded-t-3xl">
-                        <button className="text-primary flex flex-col items-center"><span className="material-symbols-outlined text-3xl filled">home</span><span className="text-[10px] font-bold">Inicio</span></button>
-                        <button onClick={() => navigate('/card')} className="text-gray-500 flex flex-col items-center"><span className="material-symbols-outlined text-3xl">assignment_ind</span><span className="text-[10px]">Cartilla</span></button>
+                    <nav className="p-6 bg-surface-dark border-t border-white/5 flex justify-around rounded-t-[2rem]">
+                        <button className="text-primary"><span className="material-symbols-outlined text-3xl">home</span></button>
+                        <button onClick={() => nav('/counter')} className="opacity-30"><span className="material-symbols-outlined text-3xl">timer</span></button>
                     </nav>
-                </div>
+                </Screen>
             );
         };
 
-        // --- PANTALLAS DE CONTADOR ---
+        const App = () => (
+            <HashRouter>
+                <Routes>
+                    <Route path="/" element={<Disclaimer />} />
+                    <Route path="/welcome" element={<Welcome />} />
+                    <Route path="/dash" element={<Dash />} />
+                    <Route path="/counter" element={<Welcome />} />
+                    <Route path="/positions" element={<Welcome />} />
+                </Routes>
+            </HashRouter>
+        );
 
-        const CounterScreen = () => {
-            const navigate = useNavigate();
-            const [history, setHistory] = useStorage('ae_hist', []);
-            const [sec, setSec] = useState(0);
-            const [active, setActive] = useState(false);
-            const [start, setStart] = useState(null);
-            const timerRef = useRef(null);
-
-            useEffect(() => {
-                if (active) timerRef.current = setInterval(() => setSec(s => s + 1), 1000);
-                else clearInterval(timerRef.current);
-                return () => clearInterval(timerRef.current);
-            }, [active]);
-
-            const toggle = () => {
-                if (!active) { setSec(0); setStart(new Date()); setActive(true); }
-                else {
-                    setActive(false);
-                    const lastStart = history[0] ? new Date(history[0].raw) : null;
-                    const freq = lastStart ? Math.round((start - lastStart)/60000) : 0;
-                    setHistory([{ id: Date.now(), time: start.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), dur: sec, freq: freq, raw: start }, ...history]);
-                }
-            };
-
-            return (
-                <div className="app-container bg-background-dark flex flex-col animate-fade-in">
-                    <header className="p-6 flex justify-between items-center"><span onClick={() => navigate('/resources')} className="material-symbols-outlined text-3xl cursor-pointer">arrow_back</span><h2 className="font-bold uppercase tracking-widest text-sm opacity-50">Monitor</h2><span onClick={() => navigate('/history')} className="material-symbols-outlined text-3xl cursor-pointer">history</span></header>
-                    <main className="flex-1 flex flex-col items-center justify-center p-8">
-                        <div className={`size-80 rounded-full border-4 flex flex-col items-center justify-center bg-white/5 transition-all duration-500 ${active ? 'border-primary shadow-[0_0_40px_rgba(54,226,123,0.3)] scale-105' : 'border-white/10'}`}>
-                            <span className="text-8xl font-black tabular-nums">{Math.floor(sec/60)}:{(sec%60).toString().padStart(2,'0')}</span>
-                            <p className="text-[10px] uppercase opacity-30 mt-4 tracking-widest">Duración</p>
-                        </div>
-                        <button onClick={toggle} className={`w-full h-16 mt-12 rounded-full font-black text-2xl transition-all shadow-lg ${active ? 'bg-red-500 text-white' : 'bg-primary text-background-dark'}`}>{active ? 'FINALIZAR' : 'INICIAR'}</button>
-                    </main>
-                    <div className="p-8 bg-surface-dark grid grid-cols-3 gap-4 border-t border-white/5 rounded-t-[3rem]">
-                        <div className="text-center"><p className="text-[10px] opacity-40 uppercase mb-1">Última</p><p className="text-xl font-bold">{history[0]?.dur || 0}s</p></div>
-                        <div className="text-center"><p className="text-[10px] opacity-40 uppercase mb-1">Intervalo</p><p className="text-xl font-bold">{history[0]?.freq || 0}m</p></div>
-                        <div className="text-center"><p className="text-[10px] opacity-40 uppercase mb-1">Total</p><p className="text-xl font-bold text-primary">{history.length}</p></div>
-                    </div>
-                </div>
-            );
-        };
-
-        const HistoryScreen = () => {
-            const navigate = useNavigate();
-            const [history, setHistory] = useStorage('ae_hist', []);
-            return (
-                <div className="app-container bg-background-dark flex flex-col animate-fade-in">
-                    <header className="p-6 flex justify-between items-center sticky top-0 bg-background-dark/95 backdrop-blur z-20 border-b border-white/5"><span onClick={() => navigate('/counter')} className="material-symbols-outlined text-3xl cursor-pointer">arrow_back</span><h2 className="font-bold">Historial</h2><span onClick={() => confirm('¿Borrar historial?') && setHistory([])} className="material-symbols-outlined text-red-400 cursor-pointer">delete</span></header>
-                    <div className="p-4 space-y-3">
-                        {history.length === 0 ? <p className="text-center opacity-40 mt-10">No hay registros.</p> : history.map(h => (
-                            <div key={h.id} className="bg-surface-dark p-5 rounded-2xl flex justify-between items-center border border-white/5 shadow-sm">
-                                <div><p className="font-bold text-lg">{h.time}</p><p className="text-xs opacity-40 uppercase tracking-tighter">Frecuencia: {h.freq} min</p></div>
-                                <div className="text-right"><p className="text-2xl font-black text-primary italic">{h.dur}s</p><p className="text-[9px] uppercase opacity-30">Duración</p></div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        // --- EVALUADOR DINÁMICO (4 PASOS) ---
-        const [evalData, setEvalData] = useState({ reg: null, int: null, mov: null, alarm: null });
-
-        const EvalFlow = ({ step, question, next, back, keyName }) => {
-            const navigate = useNavigate();
-            const save = (val) => {
-                setEvalData(prev => ({...prev, [keyName]: val}));
-                navigate(next);
-            };
-            return (
-                <div className="app-container bg-background-dark p-6 animate-fade-in flex flex-col">
-                    <header className="flex justify-between items-center mb-12">
-                        <span onClick={() => navigate(back)} className="material-symbols-outlined text-3xl cursor-pointer">arrow_back</span>
-                        <p className="text-xs font-bold opacity-30 uppercase tracking-[0.2em]">Paso {step}/4</p>
-                    </header>
-                    <h2 className="text-3xl font-bold mb-10 leading-tight italic">{question}</h2>
-                    <div className="space-y-4">
-                        <button onClick={() => save(true)} className="w-full p-6 bg-surface-dark rounded-2xl border border-primary/20 text-left font-bold text-lg hover:border-primary transition-all">Sí, es el caso</button>
-                        <button onClick={() => save(false)} className="w-full p-6 bg-surface-dark rounded-2xl border border-white/5 text-left font-bold text-lg">No, no lo es</button>
-                    </div>
-                </div>
-            );
-        };
-
-        const EvalResult = () => {
-            const navigate = useNavigate();
-            let res = { t: "POSIBLE PARTO", d: "Fase activa detectada. Contacta con tu médico.", i: "check_circle", c: "text-primary" };
-            if (evalData.alarm) res = { t: "HOSPITAL AHORA", d: "Signos de alarma detectados. No esperes.", i: "emergency", c: "text-red-500" };
-            else if (!evalData.reg || evalData.mov) res = { t: "FALSA ALARMA", d: "Parece Braxton Hicks. Descansa y bebe agua.", i: "bedtime", c: "text-blue-400" };
-            
-            return (
-                <div className="app-container bg-background-dark flex flex-col items-center justify-center p-10 text-center animate-fade-in">
-                    <span className={`material-symbols-outlined text-8xl mb-8 ${res.c}`}>{res.i}</span>
-                    <h1 className="text-3xl font-bold mb-4 italic uppercase">{res.t}</h1>
-                    <p className="text-gray-400 mb-12 leading-relaxed">{res.d}</p>
-                    <button onClick={() => navigate('/resources')} className="w-full py-4 bg-white/10 rounded-full font-bold border border-white/20 uppercase tracking-widest">Volver al Inicio</button>
-                </div>
-            );
-        };
-
-        // --- PANTALLAS DE INFORMACIÓN (AHORA CON IMÁGENES) ---
-
-        const BreathingScreen = () => {
-            const navigate = useNavigate();
-            return (
-                <div className="app-container bg-background-dark p-6 animate-fade-in">
-                    <header className="mb-8 flex items-center gap-4"><span onClick={() => navigate('/resources')} className="material-symbols-outlined text-3xl cursor-pointer">arrow_back</span><h2 className="text-2xl font-bold italic">Respiración Táctica</h2></header>
-                    <div className="space-y-6 pb-10">
-                         <div className="bg-surface-dark rounded-[2.5rem] overflow-hidden border border-white/5 shadow-sm">
-                            <div className="h-40 bg-cover bg-center" style={{backgroundImage: `url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600')`}}></div>
-                            <div className="p-6">
-                                <h4 className="text-primary font-bold mb-2 text-xl">Inhalación Profunda</h4>
-                                <p className="text-sm opacity-70 italic leading-relaxed">Inhala por la nariz expandiendo el abdomen, no el pecho. Imagina que envías aire directamente a la base del útero para oxigenar al bebé.</p>
-                            </div>
-                        </div>
-                        <div className="bg-surface-dark p-6 rounded-[2.5rem] border-l-4 border-blue-400">
-                            <h4 className="font-bold mb-2 uppercase text-xs tracking-widest opacity-40">Técnica "Boca de Pez"</h4>
-                            <p className="text-sm leading-relaxed">Exhala suavemente con los labios relajados y entreabiertos. Una mandíbula relajada es clave para un suelo pélvico relajado.</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const PositionsScreen = () => {
-            const navigate = useNavigate();
-            const positions = [
-                { t: "Cuatro Apoyos", d: "Alivia la presión lumbar y ayuda al bebé a rotar. Usa almohadas bajo las rodillas para mayor comodidad.", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600" },
-                { t: "Vertical Activa", d: "Caminar, bailar suavemente o apoyarse en una pared aprovecha la gravedad para facilitar el descenso.", img: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&q=80&w=600" },
-                { t: "Pelota de Parto", d: "Sentarse y hacer movimientos circulares abre la pelvis y reduce significativamente el dolor de las contracciones.", img: "https://images.unsplash.com/photo-1579126031955-89023020fbbf?auto=format&fit=crop&q=80&w=600" }
-            ];
-            return (
-                <div className="app-container bg-background-dark p-6 animate-fade-in">
-                    <header className="mb-8 flex items-center gap-4"><span onClick={() => navigate('/resources')} className="material-symbols-outlined text-3xl cursor-pointer">arrow_back</span><h2 className="text-2xl font-bold italic text-white">Libertad de Movimiento</h2></header>
-                    <div className="space-y-6 pb-10">
-                        {positions.map((p, i) => (
-                            <div key={i} className="bg-surface-dark rounded-[2.5rem] overflow-hidden border border-white/5 shadow-sm">
-                                <div className="h-48 bg-cover bg-center" style={{backgroundImage: `url('${p.img}')`}}></div>
-                                <div className="p-6">
-                                    <h4 className="font-bold text-xl mb-2 text-primary">{p.t}</h4>
-                                    <p className="text-sm opacity-70 leading-relaxed">{p.d}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        const PlanScreen = () => {
-            const navigate = useNavigate();
-            return (
-                <div className="app-container bg-background-dark p-6 animate-fade-in">
-                    <header className="mb-10 flex justify-between items-center"><span onClick={() => navigate('/resources')} className="material-symbols-outlined text-3xl cursor-pointer">arrow_back</span><p className="text-[10px] font-bold opacity-30 tracking-widest uppercase">Protocolo Aethera</p></header>
-                    <h2 className="text-3xl font-bold mb-8 italic">Tu Plan de Parto</h2>
-                    <div className="space-y-6 pb-10">
-                        <div className="bg-surface-dark rounded-[2.5rem] overflow-hidden border-l-4 border-primary">
-                            <div className="h-32 bg-cover bg-center opacity-60" style={{backgroundImage: `url('https://images.unsplash.com/photo-1603436503625-0647da60f673?auto=format&fit=crop&q=80&w=600')`}}></div>
-                            <div className="p-6">
-                                <h4 className="font-bold mb-2 text-xl">Ambiente de Calma</h4>
-                                <p className="text-sm opacity-60 leading-relaxed">Luz tenue, música relajante personal y silencio. Menos estímulos externos = Más oxitocina natural.</p>
-                            </div>
-                        </div>
-                        <div className="bg-surface-dark p-6 rounded-[2.5rem] border-l-4 border-blue-400">
-                            <h4 className="font-bold mb-2 uppercase text-xs opacity-40 tracking-widest">Preferencias Médicas</h4>
-                            <p className="text-sm leading-relaxed">Priorizar libertad de movimiento, evitar la inmovilidad en cama, pinzamiento tardío del cordón y contacto piel con piel inmediato ininterrumpido.</p>
-                        </div>
-                    </div>
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
